@@ -6,12 +6,13 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.techelevator.projects.model.Department;
 import com.techelevator.projects.model.DepartmentDAO;
 
 public class JDBCDepartmentDAO implements DepartmentDAO {
-	
+
 	private JdbcTemplate jdbcTemplate;
 
 	public JDBCDepartmentDAO(DataSource dataSource) {
@@ -20,27 +21,62 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 
 	@Override
 	public List<Department> getAllDepartments() {
-		return new ArrayList<>();
+		List<Department> department = new ArrayList<>();
+
+		String sql = "SELECT * FROM department";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+
+		while (results.next()) {
+			department.add(mapRowToDepartment(results));
+		}
+
+		return department;
 	}
 
 	@Override
 	public List<Department> searchDepartmentsByName(String nameSearch) {
-		return new ArrayList<>();
+		List<Department> department = new ArrayList<>();
+
+		String sql = "SELECT * FROM department WHERE name ILIKE ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, "%" + nameSearch + "%");
+
+		while (results.next()) {
+			department.add(mapRowToDepartment(results));
+		}
+
+		return department;
 	}
 
 	@Override
 	public void saveDepartment(Department updatedDepartment) {
-		
+		String sql = "UPDATE department SET name = ? WHERE department_id = ?";
+		jdbcTemplate.update(sql, updatedDepartment.getName(), updatedDepartment.getId());
 	}
 
 	@Override
 	public Department createDepartment(Department newDepartment) {
-		return null;
+		String sql = "INSERT INTO department (name) VALUES (?)";
+		jdbcTemplate.update(sql, newDepartment.getName());
+
+		return newDepartment;
 	}
 
 	@Override
 	public Department getDepartmentById(Long id) {
-		return null;
+
+		String sql = "SELECT * FROM department WHERE department_id = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
+
+		return mapRowToDepartment(results);
+	}
+
+	private Department mapRowToDepartment(SqlRowSet result) {
+		Department department = new Department();
+
+		department.setId(Long.parseLong(result.getString("department_id")));
+		department.setName(result.getString("name"));
+
+		return department;
 	}
 
 }
