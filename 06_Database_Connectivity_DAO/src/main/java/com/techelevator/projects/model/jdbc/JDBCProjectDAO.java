@@ -24,8 +24,8 @@ public class JDBCProjectDAO implements ProjectDAO {
 	public List<Project> getAllActiveProjects() {
 		List<Project> project = new ArrayList<>();
 
-		String sql = "SELECT * FROM project WHERE (from_date < CURRENT_DATE AND to_date > CURRENT_DATE) "
-				+ "OR (from_date < CURRENT_DATE AND to_date IS NULL)";
+		String sql = "SELECT * FROM project WHERE (from_date <= CURRENT_DATE AND to_date >= CURRENT_DATE) "
+				+ "OR (from_date <= CURRENT_DATE AND to_date IS NULL)";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
 
 		while (results.next()) {
@@ -47,9 +47,19 @@ public class JDBCProjectDAO implements ProjectDAO {
 		jdbcTemplate.update(sql, projectId, employeeId);
 	}
 
+	//TODO remove this before submission
+	//private long getNextProjectID() {
+//		SqlRowSet nextIDResult = jdbcTemplate.queryForRowSet("SELECT nextval('seq_project_id')");
+//		if (nextIDResult.next()) {
+//			return nextIDResult.getLong(1);
+//		}else {
+//			throw new RuntimeException("Something went wrong when fetching new project ID");
+//		}
+//	}
+	
 	private Project mapRowToProject(SqlRowSet result) {
 		Project project = new Project();
-
+		
 		project.setId(Long.parseLong(result.getString("project_id")));
 		project.setName(result.getString("name"));
 		project.setStartDate(LocalDate.parse(result.getString("from_date")));

@@ -38,7 +38,7 @@ public class JDBCEmployeeDAO implements EmployeeDAO {
 	public List<Employee> searchEmployeesByName(String firstNameSearch, String lastNameSearch) {
 		List<Employee> employees = new ArrayList<>();
 
-		String sql = "SELECT * FROM employee WHERE first_name ILIKE ? OR last_name ILIKE ?";
+		String sql = "SELECT * FROM employee WHERE first_name ILIKE ? AND last_name ILIKE ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, "%" + firstNameSearch + "%", "%" + lastNameSearch + "%");
 
 		while (results.next()) {
