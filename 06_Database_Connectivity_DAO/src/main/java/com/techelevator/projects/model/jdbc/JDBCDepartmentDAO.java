@@ -66,8 +66,10 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 
 		String sql = "SELECT department_id, name FROM department WHERE department_id = ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
-
-		return mapRowToDepartment(results);
+		results.next();
+		
+		Department department = mapRowToDepartment(results);
+		return department;
 	}
 
 	private Department mapRowToDepartment(SqlRowSet result) {
