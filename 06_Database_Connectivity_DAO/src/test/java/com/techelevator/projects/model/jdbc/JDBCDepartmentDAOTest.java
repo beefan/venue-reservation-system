@@ -153,14 +153,14 @@ public class JDBCDepartmentDAOTest {
 		row.next();  
 		long deptId = row.getLong("department_id");
 		
-		Department dept = dao.getDepartmentById(row.getLong("department_id"));
+		Department dept = dao.getDepartmentById(deptId);
 		
 		
-		//Assert.assertEquals("PARTY DEPARTMENT", dept.getName());
+		Assert.assertEquals("PARTY DEPARTMENT", dept.getName());
 		
-		//Department dept = dao.getDepartmentById((long)4);
-		//Department dept = dao.getAllDepartments().get(0);
-		System.out.println(dept.getName() + " " + dept.getId());
+		//get department that doesn't exist
+		dept = dao.getDepartmentById(deptId + 1);
+		Assert.assertNull(dept);
 	}
 
 	private void truncateDepartment() {
