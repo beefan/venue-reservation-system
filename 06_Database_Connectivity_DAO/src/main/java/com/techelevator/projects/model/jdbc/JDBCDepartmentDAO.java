@@ -23,7 +23,7 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 	public List<Department> getAllDepartments() {
 		List<Department> department = new ArrayList<>();
 
-		String sql = "SELECT * FROM department";
+		String sql = "SELECT department_id, name FROM department";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
 
 		while (results.next()) {
@@ -37,7 +37,7 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 	public List<Department> searchDepartmentsByName(String nameSearch) {
 		List<Department> department = new ArrayList<>();
 
-		String sql = "SELECT * FROM department WHERE name ILIKE ?";
+		String sql = "SELECT department_id, name FROM department WHERE name ILIKE ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, "%" + nameSearch + "%");
 
 		while (results.next()) {
@@ -64,7 +64,7 @@ public class JDBCDepartmentDAO implements DepartmentDAO {
 	@Override
 	public Department getDepartmentById(Long id) {
 
-		String sql = "SELECT * FROM department WHERE department_id = ?";
+		String sql = "SELECT department_id, name FROM department WHERE department_id = ?";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
 		return mapRowToDepartment(results);
