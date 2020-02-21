@@ -7,9 +7,10 @@ import com.techelevator.excelsior.model.Space;
 
 public interface SpaceDAO {
 
-	public List<Space> getAvailableSpaces(LocalDate startDate, LocalDate endDate, int numberOfAttendees);
-
 	public List<Space> getSpacesByVenueId(long venueId);
+
+	public List<Space> getAvailableSpaces(LocalDate startDate, LocalDate endDate, int numberOfAttendees,
+			boolean isAccesible, double dailyRate);
 
 	// TODO Bonus Override for Advanced Search
 	// public List<Space> getAvailableSpaces(LocalDate startDate, LocalDate endDate,

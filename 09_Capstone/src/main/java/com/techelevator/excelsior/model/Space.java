@@ -8,7 +8,7 @@ public class Space {
 	private boolean isAccessible;
 	private int openFrom;
 	private int openTo;
-	private int dailyRate;
+	private double dailyRate;
 	private int maxOccupancy;
 
 	public long getId() {
@@ -59,11 +59,11 @@ public class Space {
 		this.openTo = openTo;
 	}
 
-	public int getDailyRate() {
+	public double getDailyRate() {
 		return dailyRate;
 	}
 
-	public void setDailyRate(int dailyRate) {
+	public void setDailyRate(double dailyRate) {
 		this.dailyRate = dailyRate;
 	}
 

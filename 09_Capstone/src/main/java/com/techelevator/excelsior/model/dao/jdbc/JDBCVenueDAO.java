@@ -51,7 +51,7 @@ public class JDBCVenueDAO implements VenueDAO {
 	private Venue mapRowToVenue(SqlRowSet result) {
 		Venue venue = new Venue();
 
-		venue.setId(Long.parseLong(result.getString("venue_id")));
+		venue.setId(result.getLong("venue_id"));
 		venue.setName(result.getString("venue_name"));
 		venue.setCityName(result.getString("city_name"));
 		venue.setStateName(result.getString("state_name"));

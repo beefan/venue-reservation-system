@@ -11,6 +11,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.techelevator.DAOIntegrationTest;
+import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.Venue;
 
 public class JDBCVenueDAOTest extends DAOIntegrationTest {
@@ -49,7 +50,8 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		Assert.assertEquals("The Stinky Skunk", venues.get(0).getName());
 		Assert.assertEquals("Super smelly place", venues.get(0).getDescription());
 		Assert.assertEquals(new ArrayList<String>(), venues.get(0).getCategories());
-		Assert.assertNull(venues.get(0).getSpaces());
+		Assert.assertEquals(new ArrayList<Space>(), venues.get(0).getSpaces());
+		// Assert.assertNull(venues.get(0).getSpaces());
 
 		// add a second venue
 		sql = "INSERT INTO venue (id, name, city_id, description) VALUES "
@@ -59,13 +61,13 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		long id = row.getLong("id");
 
 		// add one category to second venue
-		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES " + "(?, 6)";
+		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES (?, 6)";
 		jdbcTemplate.update(sql, id);
 
 		venues = dao.getVenues(spaceDao);
 
 		// Test for added category
-		Assert.assertEquals("Modern", venues.get(1).getCategories().get(0));
+		Assert.assertEquals("Modern", venues.get(0).getCategories().get(0));
 
 		// add one category to second venue
 		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES " + "(?, 4)";
@@ -74,9 +76,9 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		venues = dao.getVenues(spaceDao);
 
 		// Test for added category
-		Assert.assertEquals("Rustic", venues.get(1).getCategories().get(0));
-		Assert.assertEquals("Modern", venues.get(1).getCategories().get(1));
-		Assert.assertEquals(2, venues.get(1).getCategories().size());
+		Assert.assertEquals("Rustic", venues.get(0).getCategories().get(0));
+		Assert.assertEquals("Modern", venues.get(0).getCategories().get(1));
+		Assert.assertEquals(2, venues.get(0).getCategories().size());
 
 		// add one space
 		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
@@ -86,7 +88,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		venues = dao.getVenues(spaceDao);
 
 		// Test for added space
-		Assert.assertEquals("Mars Rover", venues.get(1).getSpaces().get(0).getName());
+		Assert.assertEquals("Mars Rover", venues.get(0).getSpaces().get(0).getName());
 
 		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
 				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'International Station', "
@@ -96,9 +98,9 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		venues = dao.getVenues(spaceDao);
 
 		// Test for added space
-		Assert.assertEquals("International Station", venues.get(1).getSpaces().get(0).getName());
-		Assert.assertEquals("Mars Rover", venues.get(1).getSpaces().get(1).getName());
-		Assert.assertEquals(2, venues.get(1).getSpaces().size());
+		Assert.assertEquals("International Station", venues.get(0).getSpaces().get(1).getName());
+		Assert.assertEquals("Mars Rover", venues.get(0).getSpaces().get(0).getName());
+		Assert.assertEquals(2, venues.get(0).getSpaces().size());
 
 		// Test for updated size
 		Assert.assertEquals(2, venues.size());
