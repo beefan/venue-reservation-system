@@ -42,6 +42,30 @@ public class JDBCSpaceDAO implements SpaceDAO {
 		return space;
 	}
 
+	@Override
+	public List<Space> getAvailableSpacesForVenue(long venueId, LocalDate startDate, LocalDate endDate,
+			int numberOfAttendees) {
+		List<Space> space = new LinkedList<Space>();
+		int startMonth = startDate.getMonthValue();
+		int endMonth = endDate.getMonthValue();
+
+		String sql = "SELECT id, venue_id, name, is_accessible, open_from, open_to, "
+				+ "daily_rate::decimal, max_occupancy FROM space WHERE venue_id = ? AND (((? BETWEEN "
+				+ "open_from AND open_to) AND (? BETWEEN open_from AND open_to) ) OR open_from IS NULL) "
+				+ "AND id NOT IN ( SELECT DISTINCT space_id FROM reservation WHERE "
+				+ "( ? BETWEEN start_date AND end_date ) OR (? BETWEEN start_date AND end_date)) "
+				+ "AND ? <= max_occupancy";
+
+		SqlRowSet spaceResults = jdbcTemplate.queryForRowSet(sql, venueId, startMonth, endMonth, startDate, endDate,
+				numberOfAttendees);
+
+		while (spaceResults.next()) {
+			space.add(mapRowToSpace(spaceResults));
+		}
+
+		return space;
+	}
+
 	private Space mapRowToSpace(SqlRowSet result) {
 		Space space = new Space();
 

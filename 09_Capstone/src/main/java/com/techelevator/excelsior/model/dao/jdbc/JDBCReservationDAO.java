@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.techelevator.excelsior.model.Reservation;
-import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.dao.ReservationDAO;
 
 public class JDBCReservationDAO implements ReservationDAO {
@@ -49,13 +48,6 @@ public class JDBCReservationDAO implements ReservationDAO {
 		}
 
 		return reservation;
-	}
-
-	@Override
-	public List<Space> getAvailableSpaces(List<Space> spaces, LocalDate startDate, LocalDate endDate,
-			int numberOfAteendees) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private Reservation mapRowToReservation(SqlRowSet result) {

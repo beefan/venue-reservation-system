@@ -1,8 +1,10 @@
 package com.techelevator.excelsior.menu;
 
+import java.text.DateFormatSymbols;
 import java.util.List;
 import java.util.Scanner;
 
+import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.Venue;
 
 public class Menu {
@@ -55,10 +57,38 @@ public class Menu {
 		System.out.println("\n" + venue.getDescription());
 		System.out.println("\nWhat would you like to do next?");
 		System.out.println("1) View Spaces");
-		System.out.println("2) Search for Reservation");
 		System.out.println("R) Return to Previous Screen");
 
-		return getUserChoice("[12R]");
+		return getUserChoice("[1R]");
+	}
+
+	public String displayVenueSpaces(Venue venue) {
+
+		int indexVariable = 1;
+
+		System.out.println();
+		System.out.println(venue.getName());
+		System.out.println();
+		System.out.printf("%-2s %-30s %-12s %-12s %-15s %-20s\n", " ", "Name", "Open", "Close", "Daily Rate",
+				"Max. Occupancy");
+		for (Space space : venue.getSpaces()) {
+			System.out.printf("%s %-30s %-12s %-12s $%-19.2f %-20d\n", "#" + indexVariable, space.getName(),
+					getMonth(space.getOpenFrom()), getMonth(space.getOpenTo()), space.getDailyRate(),
+					space.getMaxOccupancy());
+			indexVariable++;
+		}
+		System.out.println();
+		System.out.println("What would you like to do next?");
+		System.out.println("1) Reserve a Space");
+		System.out.println("R) Return to Previous Screen");
+
+		return getUserChoice("[1R]");
+
+	}
+
+	public String getReservationStartDateFromUser() {
+		// TODO Reserve A Space Menu
+		return null;
 	}
 
 	private String getUserChoice(String regex) {
@@ -73,6 +103,13 @@ public class Menu {
 			}
 		}
 		return userInput;
+	}
+
+	private String getMonth(int month) {
+		if (month == 0) {
+			return "";
+		}
+		return new DateFormatSymbols().getMonths()[month - 1];
 	}
 
 }

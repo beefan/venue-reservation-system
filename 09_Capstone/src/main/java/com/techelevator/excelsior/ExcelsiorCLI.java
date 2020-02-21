@@ -64,10 +64,21 @@ public class ExcelsiorCLI {
 		while (isRunning) {
 			switch (menu.displayVenueDetails(venue)) {
 			case "1":
-				// TODO Implement View Spaces
+				venueSpaces(venue);
 				break;
-			case "2":
-				// TODO Implement Search for Reservation
+			case "R":
+				isRunning = false;
+				break;
+			}
+		}
+	}
+
+	private void venueSpaces(Venue venue) {
+		boolean isRunning = true;
+		while (isRunning) {
+			switch (menu.displayVenueSpaces(venue)) {
+			case "1":
+				menu.getReservationStartDateFromUser();
 				break;
 			case "R":
 				isRunning = false;

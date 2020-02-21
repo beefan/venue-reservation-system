@@ -51,6 +51,8 @@ public class JDBCReservationDAOTest extends DAOIntegrationTest {
 
 	}
 
+	// TODO Test Search For Reservation
+
 	private void truncateReservation() {
 		String sql = "TRUNCATE reservation CASCADE";
 		jdbcTemplate.update(sql);

@@ -12,6 +12,8 @@ public interface SpaceDAO {
 	public List<Space> getAvailableSpaces(LocalDate startDate, LocalDate endDate, int numberOfAttendees,
 			boolean isAccesible, double dailyRate);
 
+	List<Space> getAvailableSpacesForVenue(long venueId, LocalDate startDate, LocalDate endDate, int numberOfAteendees);
+
 	// TODO Bonus Override for Advanced Search
 	// public List<Space> getAvailableSpaces(LocalDate startDate, LocalDate endDate,
 	// int numberOfAttendees, double dailyPrice, boolean isAccessible, long
