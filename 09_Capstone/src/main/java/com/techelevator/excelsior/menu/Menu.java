@@ -175,6 +175,17 @@ public class Menu {
 
 	}
 
+	public String displayNoAvailableSpaces() {
+		System.out.println();
+		System.out.println("Sorry, but there are no available spaces that meet your needs.");
+		System.out.println();
+		System.out.println("What would you like to do next?");
+		System.out.println("1) Try another search");
+		System.out.println("Q) Quit");
+
+		return getUserChoice("[1Q]");
+	}
+
 	public int getSpaceIdFromUser(String regex) {
 		System.out.println("Which space would you like to reserve (enter 0 to cancel)?");
 

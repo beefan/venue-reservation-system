@@ -54,7 +54,7 @@ public class JDBCSpaceDAO implements SpaceDAO {
 				+ "open_from AND open_to) AND (? BETWEEN open_from AND open_to) ) OR open_from IS NULL) "
 				+ "AND id NOT IN ( SELECT DISTINCT space_id FROM reservation WHERE "
 				+ "( ? BETWEEN start_date AND end_date ) OR (? BETWEEN start_date AND end_date)) "
-				+ "AND ? <= max_occupancy";
+				+ "AND ? <= max_occupancy LIMIT 5";
 
 		SqlRowSet spaceResults = jdbcTemplate.queryForRowSet(sql, venueId, startMonth, endMonth, startDate, endDate,
 				numberOfAttendees);

@@ -27,7 +27,7 @@ public class JDBCSpaceDAOTest extends DAOIntegrationTest {
 	}
 
 	@Test
-	public void get_available_spaces_by_venue_id() {
+	public void get_spaces_by_venue_id() {
 		truncateSpace();
 
 		// add a spaceless venue
@@ -150,6 +150,39 @@ public class JDBCSpaceDAOTest extends DAOIntegrationTest {
 		numberOfAttendees = 1;
 		spaces = dao.getAvailableSpacesForVenue(id, startDate, endDate, numberOfAttendees);
 		Assert.assertEquals(1, spaces.size());
+
+		// Add over 5 spaces
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover2', "
+				+ "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, id);
+
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover3', "
+				+ "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, id);
+
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover4', "
+				+ "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, id);
+
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover5', "
+				+ "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, id);
+
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover6', "
+				+ "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, id);
+
+		// Test for only returns 5 possible spaces
+		startDate = LocalDate.of(2020, 3, 29);
+		endDate = LocalDate.of(2020, 3, 30);
+		numberOfAttendees = 1;
+		spaces = dao.getAvailableSpacesForVenue(id, startDate, endDate, numberOfAttendees);
+		Assert.assertEquals(5, spaces.size());
 
 	}
 

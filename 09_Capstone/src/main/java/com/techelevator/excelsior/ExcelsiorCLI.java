@@ -2,6 +2,7 @@ package com.techelevator.excelsior;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -9,6 +10,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import com.techelevator.excelsior.menu.Menu;
 import com.techelevator.excelsior.model.Reservation;
+import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.Venue;
 
 public class ExcelsiorCLI {
@@ -98,8 +100,14 @@ public class ExcelsiorCLI {
 			LocalDate startDate = menu.getReservationStartDateFromUser();
 			LocalDate endDate = menu.getReservationEndDateFromUser(startDate);
 			int numberOfAttendees = menu.getNumberOfAttendeesFromUser();
-			String spaceIdValidation = menu.displayAvailableSpacesToUser(
-					bookingAgent.getAvailableSpacesForVenue(venue.getId(), startDate, endDate, numberOfAttendees),
+			List<Space> spaces = bookingAgent.getAvailableSpacesForVenue(venue.getId(), startDate, endDate,
+					numberOfAttendees);
+			if (spaces.size() < 1) {
+				isLocalRunning = false;
+				noAvailableSpaces();
+				break;
+			}
+			String spaceIdValidation = menu.displayAvailableSpacesToUser(spaces,
 					ChronoUnit.DAYS.between(startDate, endDate));
 			long spaceId = menu.getSpaceIdFromUser(spaceIdValidation);
 			if (spaceId == 0) {
@@ -110,6 +118,22 @@ public class ExcelsiorCLI {
 			Reservation reservation = bookingAgent.addReservation(spaceId, numberOfAttendees, startDate, endDate,
 					reservedFor);
 			reservationConfirmation(reservation);
+		}
+	}
+
+	private void noAvailableSpaces() {
+		boolean isLocalRunning = true;
+
+		while (isLocalRunning && isRunning) {
+			switch (menu.displayNoAvailableSpaces()) {
+			case "1":
+				isLocalRunning = false;
+				// viewVenues();
+				break;
+			case "Q":
+				isRunning = false;
+				break;
+			}
 		}
 	}
 
