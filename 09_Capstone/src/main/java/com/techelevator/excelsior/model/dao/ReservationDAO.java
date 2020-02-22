@@ -7,7 +7,7 @@ import com.techelevator.excelsior.model.Reservation;
 
 public interface ReservationDAO {
 
-	public void addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
+	public Reservation addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
 			String reservedFor);
 
 	public List<Reservation> searchReservations(long spaceId, LocalDate startDate, LocalDate endDate);

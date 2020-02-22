@@ -10,6 +10,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.techelevator.DAOIntegrationTest;
+import com.techelevator.excelsior.model.Reservation;
 
 public class JDBCReservationDAOTest extends DAOIntegrationTest {
 
@@ -35,7 +36,7 @@ public class JDBCReservationDAOTest extends DAOIntegrationTest {
 		LocalDate endDate = LocalDate.of(2020, 6, 9);
 		String reservedFor = "Martha";
 
-		dao.addReservation(spaceId, numberOfAttendees, startDate, endDate, reservedFor);
+		Reservation reservation = dao.addReservation(spaceId, numberOfAttendees, startDate, endDate, reservedFor);
 
 		String sql = "SELECT reservation_id, space_id, number_of_attendees, start_date, end_date, reserved_for "
 				+ "FROM reservation WHERE reserved_for = ?";
@@ -49,9 +50,17 @@ public class JDBCReservationDAOTest extends DAOIntegrationTest {
 			Assert.assertEquals(reservedFor, row.getString("reserved_for"));
 		}
 
-	}
+		// Test returns reservation object
+		Assert.assertNotNull(reservation);
+		Assert.assertEquals(row.getLong("reservation_id"), reservation.getId());
+		Assert.assertEquals("Marvin Gardens", reservation.getSpace());
+		Assert.assertEquals("Hidden Owl Eatery", reservation.getVenue());
+		Assert.assertEquals(numberOfAttendees, reservation.getNumberOfAttendees());
+		Assert.assertEquals(startDate, reservation.getStartDate());
+		Assert.assertEquals(endDate, reservation.getEndDate());
+		Assert.assertEquals(reservedFor, reservation.getReservedFor());
 
-	// TODO Test Search For Reservation
+	}
 
 	private void truncateReservation() {
 		String sql = "TRUNCATE reservation CASCADE";

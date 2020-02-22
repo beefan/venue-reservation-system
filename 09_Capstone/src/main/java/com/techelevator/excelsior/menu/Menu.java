@@ -1,9 +1,12 @@
 package com.techelevator.excelsior.menu;
 
 import java.text.DateFormatSymbols;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Scanner;
 
+import com.techelevator.excelsior.model.Reservation;
 import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.Venue;
 
@@ -20,19 +23,21 @@ public class Menu {
 	}
 
 	public String displayVenues(List<Venue> venues) {
-		String regex = "[R";
+		String regex = "(R";
 		int counter = 1;
 
-		System.out.println("Which venue would you like to view?");
+		System.out.println("Excelsior Venue List: ");
 		for (Venue venue : venues) {
 			System.out.println(counter + ") " + venue.getName());
-			regex += counter;
+			regex += "|" + counter;
 			counter++;
 		}
 
-		regex += "]";
+		regex += ")";
 
 		System.out.println("R) Return to Previous Screen");
+		System.out.println();
+		System.out.println("Which venue would you like to view?");
 
 		return getUserChoice(regex);
 
@@ -86,9 +91,133 @@ public class Menu {
 
 	}
 
-	public String getReservationStartDateFromUser() {
-		// TODO Reserve A Space Menu
-		return null;
+	public LocalDate getReservationStartDateFromUser() {
+
+		String date;
+		String validDateRegex = "^(((0[1-9]|1[012])/(0[1-9]|1\\d|2[0-8])"
+				+ "|(0[13456789]|1[012])/(29|30)|(0[13578]|1[02])/31)/(19|"
+				+ "[2-9]\\d)\\d{2}|0?2/29/((19|[2-9]\\d)(0[48]|[2468][048]|"
+				+ "[13579][26])|(([2468][048]|[3579][26])00)))$";
+
+		while (true) {
+			System.out.println("When do you need the space? (MM/DD/YYYY) ");
+			System.out.println();
+			date = scanner.nextLine();
+
+			if (date.matches(validDateRegex)) {
+
+				LocalDate userDateChoice = LocalDate.parse(formatDateForParsing(date));
+				if (userDateChoice.compareTo(LocalDate.now()) > 0) {
+					return userDateChoice;
+				} else {
+					System.out.println();
+					System.out.println("That date is before today. You can't book then, silly. Try again. \n");
+				}
+			} else {
+				System.out.println();
+				System.out.println("That is not a valid date. Try MM/DD/YYYY format. \n");
+			}
+		}
+	}
+
+	public LocalDate getReservationEndDateFromUser(LocalDate date) {
+
+		System.out.println("How many days will you need the space? ");
+
+		String daysToStay;
+
+		while (true) {
+			daysToStay = scanner.nextLine();
+			if (daysToStay.matches("^\\d+$")) {
+				LocalDate endDate = date.plus(Long.parseLong(daysToStay), ChronoUnit.DAYS);
+				return endDate;
+			} else {
+				System.out.println(
+						"You have entered an invalid value to represent how many days you want to stay. Please try again.");
+			}
+		}
+
+	}
+
+	public int getNumberOfAttendeesFromUser() {
+		System.out.println("How many people will be in attendance? ");
+
+		String numberOfAttendees;
+
+		while (true) {
+			numberOfAttendees = scanner.nextLine();
+			if (numberOfAttendees.matches("^\\d+$")) {
+				return Integer.parseInt(numberOfAttendees);
+			} else {
+				System.out.println(
+						"You have entered an invalid value to represent your number of attendees. Please try again.");
+			}
+		}
+	}
+
+	public String displayAvailableSpacesToUser(List<Space> spaces, long lengthOfStay) {
+		String regex = "(0";
+		System.out.println();
+		System.out.println("The following spaces are available based on your needs:");
+		System.out.println();
+
+		System.out.printf("%-10s %-25s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate", "Max. Occup.",
+				"Accessible?", "Total Cost");
+		for (Space space : spaces) {
+			System.out.printf("%-10d %-25s $%-12.2f %-12d %-15s $%-15.2f\n", space.getId(), space.getName(),
+					space.getDailyRate(), space.getMaxOccupancy(), space.isAccessible() ? "Yes" : "No",
+					(space.getDailyRate() * lengthOfStay));
+			regex = regex + "|" + space.getId();
+		}
+
+		regex += ")";
+		return regex;
+
+	}
+
+	public int getSpaceIdFromUser(String regex) {
+		System.out.println("Which space would you like to reserve (enter 0 to cancel)?");
+
+		return Integer.parseInt(getUserChoice(regex));
+	}
+
+	public String getReservedForFromUser() {
+		System.out.println("Who is this reservation for?");
+		return scanner.nextLine();
+	}
+
+	public void displayReservationDetailsToUser(Reservation reservation) {
+		System.out.println("Thanks for submitting your reservation! The details for you event are listed below:");
+		System.out.println();
+		System.out.printf("%25s %-25d\n", "Confirmation #: ", reservation.getId());
+		System.out.printf("%25s %-25s\n", "Venue: ", reservation.getVenue());
+		System.out.printf("%25s %-25s\n", "Space: ", reservation.getSpace());
+		System.out.printf("%25s %-25s\n", "Reserved For: ", reservation.getReservedFor());
+		System.out.printf("%25s %-25d\n", "Attendees: ", reservation.getNumberOfAttendees());
+		System.out.printf("%25s %-25s\n", "Arrival Date: ", formatDateForDisplay(reservation.getStartDate()));
+		System.out.printf("%25s %-25s\n", "Departure Date: ", formatDateForDisplay(reservation.getEndDate()));
+		System.out.printf("%25s $%-25.2f\n", "Total Cost: ", reservation.getTotalCost());
+	}
+
+	public String displayExitMenu() {
+		System.out.println();
+		System.out.println();
+		System.out.println("What would you like to do next?");
+		System.out.println("R) Return to Main Menu");
+		System.out.println("Q) Quit");
+
+		return getUserChoice("[QR]");
+
+	}
+
+	private String formatDateForParsing(String dateString) {
+		return dateString.substring(6) + "-" + dateString.substring(0, 2) + "-" + dateString.substring(3, 5);
+	}
+
+	private String formatDateForDisplay(LocalDate date) {
+		String dateString = String.valueOf(date);
+		dateString = dateString.substring(5, 7) + "/" + dateString.substring(8) + "/" + dateString.substring(0, 4);
+		return dateString;
 	}
 
 	private String getUserChoice(String regex) {

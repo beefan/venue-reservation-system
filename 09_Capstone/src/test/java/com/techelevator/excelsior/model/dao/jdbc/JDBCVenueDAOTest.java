@@ -1,6 +1,7 @@
 package com.techelevator.excelsior.model.dao.jdbc;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -34,7 +35,8 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		truncateVenue();
 
 		// test empty table returns 0 size
-		List<Venue> venues = dao.getVenues(spaceDao);
+		List<Venue> venues = new LinkedList<Venue>();
+		venues = dao.getVenues(spaceDao);
 		Assert.assertEquals(0, venues.size());
 
 		// add venue
@@ -59,6 +61,11 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql);
 		row.next();
 		long id = row.getLong("id");
+		venues = dao.getVenues(spaceDao);
+
+		// Test for alphabetical order
+		Assert.assertEquals("The Singing Belle", venues.get(0).getName());
+		Assert.assertEquals("The Stinky Skunk", venues.get(1).getName());
 
 		// add one category to second venue
 		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES (?, 6)";

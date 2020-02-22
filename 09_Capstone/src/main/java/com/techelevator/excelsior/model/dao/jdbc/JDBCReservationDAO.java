@@ -22,12 +22,24 @@ public class JDBCReservationDAO implements ReservationDAO {
 	}
 
 	@Override
-	public void addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
+	public Reservation addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
 			String reservedFor) {
 		String sql = "INSERT INTO reservation (reservation_id, space_id, number_of_attendees, start_date, end_date, "
-				+ "reserved_for) VALUES (DEFAULT, ?, ?, ?, ?, ?)";
+				+ "reserved_for) VALUES (DEFAULT, ?, ?, ?, ?, ?) RETURNING reservation_id";
 
-		jdbcTemplate.update(sql, spaceId, numberOfAttendees, startDate, endDate, reservedFor);
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql, spaceId, numberOfAttendees, startDate, endDate, reservedFor);
+		row.next();
+		long reservationId = row.getLong("reservation_id");
+
+		sql = "SELECT reservation_id, space.name AS space_name, venue.name AS venue_name, "
+				+ "space.daily_rate::decimal AS daily_rate, number_of_attendees, start_date, end_date, reserved_for "
+				+ "FROM reservation JOIN space ON reservation.space_id = space.id "
+				+ "JOIN venue ON space.venue_id = venue.id WHERE reservation_id = ?";
+
+		SqlRowSet reservationResults = jdbcTemplate.queryForRowSet(sql, reservationId);
+		reservationResults.next();
+		Reservation reservation = mapRowToReservation(reservationResults);
+		return reservation;
 
 	}
 
@@ -36,7 +48,7 @@ public class JDBCReservationDAO implements ReservationDAO {
 		List<Reservation> reservation = new LinkedList<Reservation>();
 
 		String sql = "SELECT reservation_id, space.name AS space_name, venue.name AS venue_name, "
-				+ "space.daily_rate AS daily_rate, number_of_attendees, start_date, end_date, reserved_for "
+				+ "space.daily_rate::decimal AS daily_rate, number_of_attendees, start_date, end_date, reserved_for "
 				+ "FROM reservation JOIN space ON reservation.space_id = space.id "
 				+ "JOIN venue ON space.venue_id = venue.id " + "WHERE space_id = ? AND (start_date BETWEEN ? AND ?) "
 				+ "AND (end_date BETWEEN ? AND ?)";
