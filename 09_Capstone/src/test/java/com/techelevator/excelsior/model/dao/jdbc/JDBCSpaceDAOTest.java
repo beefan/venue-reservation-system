@@ -27,6 +27,105 @@ public class JDBCSpaceDAOTest extends DAOIntegrationTest {
 	}
 
 	@Test
+	public void get_all_available_spaces() {
+		truncateSpace();
+		LocalDate startDate = LocalDate.of(2020, 03, 18);
+		LocalDate endDate = LocalDate.of(2020, 03, 22);
+		int numberOfAttendees = 2;
+		boolean isAccessible = false;
+		double dailyRate = 5000;
+		int category = 0;
+
+		// add a spaceless venue
+		String sql = "INSERT INTO venue (id, name, city_id, description) VALUES "
+				+ "(DEFAULT, 'The Singing Belle', 3, 'Super sound spot') RETURNING id";
+		SqlRowSet row = jdbcTemplate.queryForRowSet(sql);
+		row.next();
+		long venueId = row.getLong("id");
+
+		// test empty table returns 0 size
+		List<Space> spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate,
+				category);
+		Assert.assertEquals(0, spaces.size());
+
+		// add one space
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover', " + "true, 2, 10, 1004.00, 2)";
+		jdbcTemplate.update(sql, venueId);
+
+		// test table returns 1
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, category);
+		Assert.assertEquals(1, spaces.size());
+
+		// add categories to category table
+		sql = "INSERT INTO category (id, name) VALUES (DEFAULT, 'Drama') RETURNING id";
+		row = jdbcTemplate.queryForRowSet(sql);
+		row.next();
+		int categoryIdDrama = row.getInt("id");
+
+		sql = "INSERT INTO category (id, name) VALUES (DEFAULT, 'Horror') RETURNING id";
+		row = jdbcTemplate.queryForRowSet(sql);
+		row.next();
+		int categoryIdHorror = row.getInt("id");
+
+		// assign categories to venue
+		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES (?,?)";
+		jdbcTemplate.update(sql, venueId, categoryIdHorror);
+
+		// test table returns 1 with category search
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate,
+				categoryIdHorror);
+		Assert.assertEquals(1, spaces.size());
+
+		// assign categories to venue
+		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES (?,?)";
+		jdbcTemplate.update(sql, venueId, categoryIdDrama);
+
+		// test table still returns 1 with horror category search
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate,
+				categoryIdHorror);
+		Assert.assertEquals(1, spaces.size());
+
+		// test table returns 1 with drama category search
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate,
+				categoryIdDrama);
+		Assert.assertEquals(1, spaces.size());
+
+		// test table returns 1 with no categories indicated
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, 0);
+		Assert.assertEquals(1, spaces.size());
+
+		// test table returns 0 if daily rate out of range
+		dailyRate = 600;
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, 0);
+		Assert.assertEquals(0, spaces.size());
+
+		// test table returns 0 if numberOrAttendees out of range
+		numberOfAttendees = 600;
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, 0);
+		Assert.assertEquals(0, spaces.size());
+
+		// test table returns 0 if isAccessible false and true required
+		sql = "INSERT INTO space (id, venue_id, name, is_accessible, open_from, "
+				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Room Of Stairs', "
+				+ "false, 2, 10, 1004.00, 700)";
+		jdbcTemplate.update(sql, venueId);
+
+		isAccessible = true;
+
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, 0);
+		Assert.assertEquals(0, spaces.size());
+
+		// test table returns 0 if date needed out of range
+		startDate = LocalDate.of(2020, 01, 18);
+		endDate = LocalDate.of(2020, 01, 22);
+
+		spaces = dao.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate, 0);
+		Assert.assertEquals(0, spaces.size());
+
+	}
+
+	@Test
 	public void get_spaces_by_venue_id() {
 		truncateSpace();
 
