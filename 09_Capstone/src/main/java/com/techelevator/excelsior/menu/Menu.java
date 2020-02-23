@@ -230,24 +230,29 @@ public class Menu {
 	public String displayAvailableSpacesToUser(List<Space> spaces, long lengthOfStay) {
 		String regex = "(0";
 		long venueId = spaces.get(0).getVenueId();
+		int spacesToDisplayPerVenue = 5;
 		System.out.println();
 		System.out.println("The following spaces are available based on your needs:");
 		System.out.println();
 		System.out.println(spaces.get(0).getVenueName());
-		System.out.printf("%-10s %-30s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate", "Max. Occup.",
+		System.out.printf("%-10s %-35s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate", "Max. Occup.",
 				"Accessible?", "Total Cost");
 		for (Space space : spaces) {
 			if (space.getVenueId() != venueId) {
 				venueId = space.getVenueId();
+				spacesToDisplayPerVenue = 5;
 				System.out.println();
 				System.out.println(space.getVenueName());
-				System.out.printf("%-10s %-30s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate",
+				System.out.printf("%-10s %-35s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate",
 						"Max. Occup.", "Accessible?", "Total Cost");
 			}
-			System.out.printf("%-10d %-30s $%-12.2f %-12d %-15s $%-15.2f\n", space.getId(), space.getName(),
-					space.getDailyRate(), space.getMaxOccupancy(), space.isAccessible() ? "Yes" : "No",
-					(space.getDailyRate() * lengthOfStay));
-			regex = regex + "|" + space.getId();
+			if (spacesToDisplayPerVenue > 0) {
+				System.out.printf("%-10d %-35s $%-12.2f %-12d %-15s $%-15.2f\n", space.getId(), space.getName(),
+						space.getDailyRate(), space.getMaxOccupancy(), space.isAccessible() ? "Yes" : "No",
+						(space.getDailyRate() * lengthOfStay));
+				regex = regex + "|" + space.getId();
+			}
+			spacesToDisplayPerVenue--;
 		}
 
 		System.out.println();
