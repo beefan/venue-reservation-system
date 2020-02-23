@@ -10,9 +10,6 @@ public interface ReservationDAO {
 	public Reservation addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
 			String reservedFor);
 
-	// public List<Reservation> searchReservations(long spaceId, LocalDate
-	// startDate, LocalDate endDate);
-
 	public List<Reservation> getUpcomingReservations(Long venueId);
 
 }

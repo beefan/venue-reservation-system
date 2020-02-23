@@ -43,30 +43,6 @@ public class JDBCReservationDAO implements ReservationDAO {
 
 	}
 
-	// @Override
-	// public List<Reservation> searchReservations(long spaceId, LocalDate
-	// startDate, LocalDate endDate) {
-	// List<Reservation> reservation = new LinkedList<Reservation>();
-	//
-	// String sql = "SELECT reservation_id, space.name AS space_name, venue.name AS
-	// venue_name, "
-	// + "space.daily_rate::decimal AS daily_rate, number_of_attendees, start_date,
-	// end_date, reserved_for "
-	// + "FROM reservation JOIN space ON reservation.space_id = space.id "
-	// + "JOIN venue ON space.venue_id = venue.id " + "WHERE space_id = ? AND
-	// (start_date BETWEEN ? AND ?) "
-	// + "AND (end_date BETWEEN ? AND ?)";
-	// SqlRowSet reservationResults = jdbcTemplate.queryForRowSet(sql, spaceId,
-	// startDate, endDate, startDate,
-	// endDate);
-	//
-	// while (reservationResults.next()) {
-	// reservation.add(mapRowToReservation(reservationResults));
-	// }
-	//
-	// return reservation;
-	// }
-
 	@Override
 	public List<Reservation> getUpcomingReservations(Long venueId) {
 
