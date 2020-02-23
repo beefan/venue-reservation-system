@@ -73,6 +73,9 @@ public class ExcelsiorCLI {
 			case "1":
 				listVenueSpaces(venue);
 				break;
+			case "2":
+				viewThirtyDayReservations(venue.getId());
+				break;
 			case "R":
 				isLocalRunning = false;
 				break;
@@ -89,6 +92,21 @@ public class ExcelsiorCLI {
 				break;
 			case "R":
 				isLocalRunning = false;
+				break;
+			}
+		}
+	}
+
+	private void viewThirtyDayReservations(long venueId) {
+		boolean isLocalRunning = true;
+		List<Reservation> reservations = bookingAgent.getThirtyDayReservations(venueId);
+		while (isRunning && isLocalRunning) {
+			switch (menu.displayThirtyDayReservations(reservations)) {
+			case "R":
+				isLocalRunning = false;
+				break;
+			case "Q":
+				isRunning = false;
 				break;
 			}
 		}

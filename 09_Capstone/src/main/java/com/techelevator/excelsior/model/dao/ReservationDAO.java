@@ -12,6 +12,6 @@ public interface ReservationDAO {
 
 	public List<Reservation> searchReservations(long spaceId, LocalDate startDate, LocalDate endDate);
 
-	// TODO Bonus Upcoming Reservation List - next 30 days
-	// public List <Reservation> getUpcomingReservations();
+	public List<Reservation> getUpcomingReservations(Long venueId);
+
 }

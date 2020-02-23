@@ -21,6 +21,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 	private JDBCVenueDAO dao;
 	private JdbcTemplate jdbcTemplate;
 	private JDBCSpaceDAO spaceDao;
+	private JDBCCategoryDAO categoryDao;
 
 	@Before
 	public void setup() {
@@ -28,6 +29,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		dao = new JDBCVenueDAO(dataSource);
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		spaceDao = new JDBCSpaceDAO(dataSource);
+		categoryDao = new JDBCCategoryDAO(dataSource);
 	}
 
 	@Test
@@ -36,7 +38,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 
 		// test empty table returns 0 size
 		List<Venue> venues = new LinkedList<Venue>();
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 		Assert.assertEquals(0, venues.size());
 
 		// add venue
@@ -44,7 +46,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 				+ "(DEFAULT, 'The Stinky Skunk', 2, 'Super smelly place')";
 		jdbcTemplate.update(sql);
 
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// test for added venue
 		Assert.assertEquals(1, venues.size());
@@ -61,7 +63,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		SqlRowSet row = jdbcTemplate.queryForRowSet(sql);
 		row.next();
 		long id = row.getLong("id");
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// Test for alphabetical order
 		Assert.assertEquals("The Singing Belle", venues.get(0).getName());
@@ -71,7 +73,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES (?, 6)";
 		jdbcTemplate.update(sql, id);
 
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// Test for added category
 		Assert.assertEquals("Modern", venues.get(0).getCategories().get(0));
@@ -80,7 +82,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 		sql = "INSERT INTO category_venue (venue_id, category_id) VALUES " + "(?, 4)";
 		jdbcTemplate.update(sql, id);
 
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// Test for added category
 		Assert.assertEquals("Rustic", venues.get(0).getCategories().get(0));
@@ -92,7 +94,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 				+ "open_to, daily_rate, max_occupancy) VALUES (DEFAULT, ?, 'Mars Rover', " + "true, 2, 10, 1004.00, 2)";
 		jdbcTemplate.update(sql, id);
 
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// Test for added space
 		Assert.assertEquals("Mars Rover", venues.get(0).getSpaces().get(0).getName());
@@ -102,7 +104,7 @@ public class JDBCVenueDAOTest extends DAOIntegrationTest {
 				+ "true, DEFAULT, DEFAULT, 100007.00, 12)";
 		jdbcTemplate.update(sql, id);
 
-		venues = dao.getVenues(spaceDao);
+		venues = dao.getVenues(spaceDao, categoryDao);
 
 		// Test for added space
 		Assert.assertEquals("International Station", venues.get(0).getSpaces().get(1).getName());

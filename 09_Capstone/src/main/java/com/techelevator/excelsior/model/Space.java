@@ -4,6 +4,7 @@ public class Space {
 
 	private long id;
 	private long venueId;
+	private String venueName;
 	private String name;
 	private boolean isAccessible;
 	private int openFrom;
@@ -25,6 +26,14 @@ public class Space {
 
 	public void setVenueId(long venueId) {
 		this.venueId = venueId;
+	}
+
+	public String getVenueName() {
+		return venueName;
+	}
+
+	public void setVenueName(String venueName) {
+		this.venueName = venueName;
 	}
 
 	public String getName() {

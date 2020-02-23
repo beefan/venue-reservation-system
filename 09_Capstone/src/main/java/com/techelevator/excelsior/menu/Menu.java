@@ -17,9 +17,10 @@ public class Menu {
 	public String displayMainMenu() {
 		System.out.println("What would you like to do?");
 		System.out.println("1) List Venues");
+		System.out.println("S) Search for a Space");
 		System.out.println("Q) Quit");
 
-		return getUserChoice("[1Q]");
+		return getUserChoice("[1SQ]");
 	}
 
 	public String displayVenues(List<Venue> venues) {
@@ -62,9 +63,10 @@ public class Menu {
 		System.out.println("\n" + venue.getDescription());
 		System.out.println("\nWhat would you like to do next?");
 		System.out.println("1) View Spaces");
+		System.out.println("2) View Upcoming Reservations");
 		System.out.println("R) Return to Previous Screen");
 
-		return getUserChoice("[1R]");
+		return getUserChoice("[12R]");
 	}
 
 	public String displayVenueSpaces(Venue venue) {
@@ -89,6 +91,26 @@ public class Menu {
 
 		return getUserChoice("[1R]");
 
+	}
+
+	public String displayThirtyDayReservations(List<Reservation> reservations) {
+		System.out.println();
+		if (reservations.size() == 0) {
+			System.out.println("There are no reservations in the next 30 days for this venue.");
+		} else {
+			System.out.printf("%-35s %-35s %-15s %-15s\n", "Space", "Reserved For", "From", "To");
+			for (Reservation reservation : reservations) {
+				System.out.printf("%-35s %-35s %-15s %-15s\n", reservation.getSpace(), reservation.getReservedFor(),
+						formatDateForDisplay(reservation.getStartDate()),
+						formatDateForDisplay(reservation.getEndDate()));
+			}
+		}
+		System.out.println();
+		System.out.println("What would you like to do next?");
+		System.out.println("R) Return to Previous Screen");
+		System.out.println("Q) Quit");
+
+		return getUserChoice("[RQ]");
 	}
 
 	public LocalDate getReservationStartDateFromUser() {
@@ -155,15 +177,76 @@ public class Menu {
 		}
 	}
 
+	public boolean getAccessibilityFromUser() {
+		System.out.println("Does the space require accessibility accommodations (Y/N)?");
+
+		String isAccessible;
+
+		while (true) {
+			isAccessible = scanner.nextLine();
+			if (isAccessible.matches("[YN]")) {
+				return isAccessible.equals("Y") ? true : false;
+			} else {
+				System.out.println("Invalid option. Please enter Y or N.");
+			}
+		}
+	}
+
+	public double getDailyBudgetFromUser() {
+		System.out.println("What is your daily budget for the event? (To the nearest dollar amount)");
+
+		String dailyBudget;
+
+		while (true) {
+			dailyBudget = scanner.nextLine();
+			if (dailyBudget.matches("^\\d+$")) {
+				return Double.parseDouble(dailyBudget);
+			} else {
+				System.out.println("Invalid option. Please enter whole number.");
+			}
+		}
+	}
+
+	public String getCategoryFromUser(List<String> categories) {
+		System.out.println();
+		System.out.println("Which of the categories would you like to include?");
+
+		String regex = "(N";
+		int counter = 1;
+
+		for (String category : categories) {
+			System.out.println(counter + ") " + category);
+			regex += "|" + counter;
+			counter++;
+		}
+
+		regex += ")";
+
+		System.out.println("N) None");
+		System.out.println();
+
+		return getUserChoice(regex);
+	}
+
 	public String displayAvailableSpacesToUser(List<Space> spaces, long lengthOfStay) {
 		String regex = "(0";
+		long venueId = spaces.get(0).getVenueId();
 		System.out.println();
 		System.out.println("The following spaces are available based on your needs:");
+		System.out.println();
+		System.out.println(spaces.get(0).getVenueName());
 		System.out.println();
 
 		System.out.printf("%-10s %-25s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate", "Max. Occup.",
 				"Accessible?", "Total Cost");
 		for (Space space : spaces) {
+			if (space.getVenueId() != venueId) {
+				venueId = space.getVenueId();
+				System.out.println(space.getVenueName());
+				System.out.println();
+				System.out.printf("%-10s %-25s %-12s %-12s %-15s %-15s\n", "Space #", "Name", "Daily Rate",
+						"Max. Occup.", "Accessible?", "Total Cost");
+			}
 			System.out.printf("%-10d %-25s $%-12.2f %-12d %-15s $%-15.2f\n", space.getId(), space.getName(),
 					space.getDailyRate(), space.getMaxOccupancy(), space.isAccessible() ? "Yes" : "No",
 					(space.getDailyRate() * lengthOfStay));

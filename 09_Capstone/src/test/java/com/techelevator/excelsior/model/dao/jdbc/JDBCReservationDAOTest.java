@@ -1,6 +1,7 @@
 package com.techelevator.excelsior.model.dao.jdbc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,6 +60,50 @@ public class JDBCReservationDAOTest extends DAOIntegrationTest {
 		Assert.assertEquals(startDate, reservation.getStartDate());
 		Assert.assertEquals(endDate, reservation.getEndDate());
 		Assert.assertEquals(reservedFor, reservation.getReservedFor());
+
+	}
+
+	// Test upcoming reservations
+	@Test
+	public void get_upcoming_reservations() {
+		// Setup reservation table
+		truncateReservation();
+
+		// space_id 1 is in venue_id 1
+		long venueId = 1;
+		long spaceId = 1;
+		LocalDate startDate = LocalDate.now().plusDays(10);
+		LocalDate endDate = LocalDate.now().plusDays(14);
+
+		// Add one reservations for test venue in 30 day range
+		String sql = "INSERT INTO reservation (reservation_id, space_id, number_of_attendees, start_date, end_date, reserved_for) "
+				+ "VALUES (DEFAULT, ?, 4, ?, ?, 'John Doe')";
+		jdbcTemplate.update(sql, spaceId, startDate, endDate);
+
+		// Add one reservations for different venue in 30 day range
+		sql = "INSERT INTO reservation (reservation_id, space_id, number_of_attendees, start_date, end_date, reserved_for) "
+				+ "VALUES (DEFAULT, 8, 4, ?, ?, 'John Doe')";
+		jdbcTemplate.update(sql, startDate, endDate);
+
+		startDate = LocalDate.now().minusDays(10);
+		endDate = LocalDate.now().plusDays(1);
+
+		// Add reservation before now
+		sql = "INSERT INTO reservation (reservation_id, space_id, number_of_attendees, start_date, end_date, reserved_for) "
+				+ "VALUES (DEFAULT, ?, 4, ?, ?, 'John Doe')";
+		jdbcTemplate.update(sql, spaceId, startDate, endDate);
+
+		startDate = LocalDate.now().plusDays(40);
+		endDate = LocalDate.now().plusDays(45);
+
+		// Add reservation beyond 30 day range
+		sql = "INSERT INTO reservation (reservation_id, space_id, number_of_attendees, start_date, end_date, reserved_for) "
+				+ "VALUES (DEFAULT, ?, 4, ?, ?, 'John Doe')";
+		jdbcTemplate.update(sql, spaceId, startDate, endDate);
+
+		List<Reservation> reservation = dao.getUpcomingReservations(venueId);
+
+		Assert.assertEquals(1, reservation.size());
 
 	}
 

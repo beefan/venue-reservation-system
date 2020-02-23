@@ -1,6 +1,5 @@
 package com.techelevator.excelsior.model.dao.jdbc;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class JDBCVenueDAO implements VenueDAO {
 	}
 
 	@Override
-	public List<Venue> getVenues(JDBCSpaceDAO spaceDAO) {
+	public List<Venue> getVenues(JDBCSpaceDAO spaceDAO, JDBCCategoryDAO categoryDAO) {
 
 		List<Venue> venue = new LinkedList<Venue>();
 
@@ -36,12 +35,7 @@ public class JDBCVenueDAO implements VenueDAO {
 		}
 
 		for (Venue oneVenue : venue) {
-			sql = "SELECT category.name AS category_name FROM category "
-					+ "JOIN category_venue ON category.id = category_venue.category_id "
-					+ "WHERE category_venue.venue_id = ?";
-			SqlRowSet categoryResults = jdbcTemplate.queryForRowSet(sql, oneVenue.getId());
-			addCategoriesToVenue(categoryResults, oneVenue);
-
+			oneVenue.setCategories(categoryDAO.getCategoriesByVenueId(oneVenue.getId()));
 			oneVenue.setSpaces(spaceDAO.getSpacesByVenueId(oneVenue.getId()));
 		}
 
@@ -57,14 +51,6 @@ public class JDBCVenueDAO implements VenueDAO {
 		venue.setStateName(result.getString("state_name"));
 		venue.setDescription(result.getString("venue_description"));
 		return venue;
-	}
-
-	private void addCategoriesToVenue(SqlRowSet result, Venue venue) {
-		List<String> categories = new ArrayList<>();
-		while (result.next()) {
-			categories.add(result.getString("category_name"));
-		}
-		venue.setCategories(categories);
 	}
 
 }

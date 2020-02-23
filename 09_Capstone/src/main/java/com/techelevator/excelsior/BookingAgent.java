@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import com.techelevator.excelsior.model.Reservation;
 import com.techelevator.excelsior.model.Space;
 import com.techelevator.excelsior.model.Venue;
+import com.techelevator.excelsior.model.dao.jdbc.JDBCCategoryDAO;
 import com.techelevator.excelsior.model.dao.jdbc.JDBCReservationDAO;
 import com.techelevator.excelsior.model.dao.jdbc.JDBCSpaceDAO;
 import com.techelevator.excelsior.model.dao.jdbc.JDBCVenueDAO;
@@ -17,6 +18,7 @@ public class BookingAgent {
 	JDBCVenueDAO jdbcVenueDAO;
 	JDBCSpaceDAO jdbcSpaceDAO;
 	JDBCReservationDAO jdbcReservationDAO;
+	JDBCCategoryDAO jdbcCategoryDAO;
 
 	List<Venue> venues = null;
 
@@ -24,13 +26,18 @@ public class BookingAgent {
 		jdbcVenueDAO = new JDBCVenueDAO(datasource);
 		jdbcSpaceDAO = new JDBCSpaceDAO(datasource);
 		jdbcReservationDAO = new JDBCReservationDAO(datasource);
+		jdbcCategoryDAO = new JDBCCategoryDAO(datasource);
 	}
 
 	public List<Venue> getVenues() {
 		if (venues == null) {
-			venues = jdbcVenueDAO.getVenues(jdbcSpaceDAO);
+			venues = jdbcVenueDAO.getVenues(jdbcSpaceDAO, jdbcCategoryDAO);
 		}
 		return venues;
+	}
+
+	public List<String> getCategories() {
+		return jdbcCategoryDAO.getAllCategories();
 	}
 
 	public List<Space> getAvailableSpacesForVenue(long venueId, LocalDate startDate, LocalDate endDate,
@@ -41,6 +48,10 @@ public class BookingAgent {
 	public Reservation addReservation(long spaceId, int numberOfAttendees, LocalDate startDate, LocalDate endDate,
 			String reservedFor) {
 		return jdbcReservationDAO.addReservation(spaceId, numberOfAttendees, startDate, endDate, reservedFor);
+	}
+
+	public List<Reservation> getThirtyDayReservations(long venueId) {
+		return jdbcReservationDAO.getUpcomingReservations(venueId);
 	}
 
 }
