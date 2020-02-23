@@ -26,11 +26,12 @@ public class JDBCSpaceDAO implements SpaceDAO {
 		List<Space> space = new LinkedList<Space>();
 		int startMonth = startDate.getMonthValue();
 		int endMonth = endDate.getMonthValue();
+		String dailyRateString = String.valueOf(dailyRate);
 
-		String sql = "SELECT space.id AS id, space.venue_id AS venue_id, space.name AS name, "
+		String sql = "SELECT DISTINCT space.id AS id, space.venue_id AS venue_id, space.name AS name, "
 				+ "is_accessible, open_from, open_to, daily_rate::decimal, max_occupancy, "
-				+ "venue.name AS venue_name, category_id FROM space JOIN venue ON space.venue_id = "
-				+ "venue.id JOIN category_venue ON venue.id = category_venue.venue_id WHERE "
+				+ "venue.name AS venue_name FROM space JOIN venue ON space.venue_id = "
+				+ "venue.id FULL JOIN category_venue ON venue.id = category_venue.venue_id WHERE "
 				+ "(is_accessible = true OR is_accessible = ?) AND daily_rate <= ?::money AND ";
 		if (category != 0) {
 			sql = sql + "category_id = ? AND ";
@@ -40,10 +41,16 @@ public class JDBCSpaceDAO implements SpaceDAO {
 				+ "AND open_to) ) OR open_from IS NULL) AND space.id NOT IN ( SELECT DISTINCT "
 				+ "space_id FROM reservation WHERE ( ? BETWEEN start_date AND end_date ) OR (? "
 				+ "BETWEEN start_date AND end_date)) AND ? <= max_occupancy ORDER BY venue_name";
-		;
 
-		SqlRowSet spaceResults = jdbcTemplate.queryForRowSet(sql, isAccessible, dailyRate, category, startMonth,
-				endMonth, startDate, endDate, numberOfAttendees);
+		SqlRowSet spaceResults;
+
+		if (category != 0) {
+			spaceResults = jdbcTemplate.queryForRowSet(sql, isAccessible, dailyRateString, category, startMonth,
+					endMonth, startDate, endDate, numberOfAttendees);
+		} else {
+			spaceResults = jdbcTemplate.queryForRowSet(sql, isAccessible, dailyRateString, startMonth, endMonth,
+					startDate, endDate, numberOfAttendees);
+		}
 
 		while (spaceResults.next()) {
 			space.add(mapRowToSpace(spaceResults));

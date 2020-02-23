@@ -44,12 +44,47 @@ public class ExcelsiorCLI {
 			case "1":
 				viewVenues();
 				break;
+			case "S":
+				advancedReserveASpace();
+				break;
 			case "Q":
 				isRunning = false;
 				break;
 			}
 		}
 
+	}
+
+	private void advancedReserveASpace() {
+		boolean isLocalRunning = true;
+		while (isLocalRunning && isRunning) {
+			LocalDate startDate = menu.getReservationStartDateFromUser();
+			LocalDate endDate = menu.getReservationEndDateFromUser(startDate);
+			int numberOfAttendees = menu.getNumberOfAttendeesFromUser();
+			boolean isAccessible = menu.getAccessibilityFromUser();
+			double dailyBudget = menu.getDailyBudgetFromUser();
+			String category = menu.getCategoryFromUser(bookingAgent.getCategories());
+			int categoryInt = category.equals("N") ? 0 : Integer.parseInt(category);
+
+			List<Space> spaces = bookingAgent.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible,
+					dailyBudget, categoryInt);
+			if (spaces.size() < 1) {
+				isLocalRunning = false;
+				noAvailableSpaces();
+				break;
+			}
+			String spaceIdValidation = menu.displayAvailableSpacesToUser(spaces,
+					ChronoUnit.DAYS.between(startDate, endDate));
+			long spaceId = menu.getSpaceIdFromUser(spaceIdValidation);
+			if (spaceId == 0) {
+				isLocalRunning = false;
+				break;
+			}
+			String reservedFor = menu.getReservedForFromUser();
+			Reservation reservation = bookingAgent.addReservation(spaceId, numberOfAttendees, startDate, endDate,
+					reservedFor);
+			reservationConfirmation(reservation);
+		}
 	}
 
 	private void viewVenues() {
@@ -146,7 +181,6 @@ public class ExcelsiorCLI {
 			switch (menu.displayNoAvailableSpaces()) {
 			case "1":
 				isLocalRunning = false;
-				// viewVenues();
 				break;
 			case "Q":
 				isRunning = false;

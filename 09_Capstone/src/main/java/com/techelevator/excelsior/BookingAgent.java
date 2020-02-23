@@ -40,6 +40,12 @@ public class BookingAgent {
 		return jdbcCategoryDAO.getAllCategories();
 	}
 
+	public List<Space> getAllAvailableSpaces(LocalDate startDate, LocalDate endDate, int numberOfAttendees,
+			boolean isAccessible, double dailyRate, int category) {
+		return jdbcSpaceDAO.getAllAvailableSpaces(startDate, endDate, numberOfAttendees, isAccessible, dailyRate,
+				category);
+	}
+
 	public List<Space> getAvailableSpacesForVenue(long venueId, LocalDate startDate, LocalDate endDate,
 			int numberOfAttendees) {
 		return jdbcSpaceDAO.getAvailableSpacesForVenue(venueId, startDate, endDate, numberOfAttendees);
